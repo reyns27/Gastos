@@ -35,7 +35,12 @@ const Styles = StyleSheet.create({
   },
   Title: {
     fontWeight: "bold",
+    color:'white',
+    marginLeft:10
   },
+  Text:{
+    color:'white'
+  }
 });
 
 const Login = ({ navigation }) => {
@@ -92,7 +97,7 @@ const Login = ({ navigation }) => {
         </Button>
         <View style={Styles.ViewsTwo}>
           <Text style={Styles.Title}>Gastos</Text>
-          <Text>version 0.1</Text>
+          <Text style={Styles.Text}>version 0.1</Text>
         </View>
       </ImageBackground>
     </View>
