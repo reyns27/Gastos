@@ -7,7 +7,6 @@ import {
   TextInput,
   Title,
 } from "react-native-paper";
-import Footer from "../components/Footer";
 import { View, StyleSheet, ImageBackground } from "react-native";
 
 const Home = ({ route, navigation }) => {

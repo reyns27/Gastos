@@ -9,7 +9,6 @@ const Statud = ({ route, navigation }) => {
         resizeMode="cover"
         style={{ height: 750 }}
       >
-        
       </ImageBackground>
     </View>
   );

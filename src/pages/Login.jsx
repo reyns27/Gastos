@@ -1,31 +1,26 @@
-import { useState } from "react";
-import { StyleSheet, View, ImageBackground } from "react-native";
-import {
-  Avatar,
-  Button,
-  Text,
-  TextInput,
-} from "react-native-paper";
-import * as SQLite from 'expo-sqlite';
-const DB = SQLite.openDatabase('Gastos.db');
+import { useEffect, useState } from "react";
+import { StyleSheet, View, ImageBackground, Platform } from "react-native";
+import { Avatar, Button, Text, TextInput } from "react-native-paper";
+import * as SQLite from "expo-sqlite";
+
+
 const Styles = StyleSheet.create({
-  view:{
-    display:'flex',
-    height:550,
+  view: {
+    display: "flex",
+    height: 550,
   },
   input: {
-    top:300,
+    top: 300,
     margin: 10,
-
   },
-  btn:{
-    top:300,
-    width:200,
-    marginLeft:10
+  btn: {
+    top: 300,
+    width: 200,
+    marginLeft: 10,
   },
   ViewsTwo: {
-    position:'absolute',
-    top:820,
+    position: "absolute",
+    top: 820,
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
@@ -35,12 +30,12 @@ const Styles = StyleSheet.create({
   },
   Title: {
     fontWeight: "bold",
-    color:'white',
-    marginLeft:10
+    color: "white",
+    marginLeft: 10,
   },
-  Text:{
-    color:'white'
-  }
+  Text: {
+    color: "white",
+  },
 });
 
 const Login = ({ navigation }) => {
@@ -50,11 +45,8 @@ const Login = ({ navigation }) => {
   });
 
   const Access = () => {
-    DB.transaction((sql) => {
-      sql.executeSql('SELECT *FROM Usuario',[],(_,{rows:{_array}}) => console.log(JSON.stringify(_array)),
-      () => console.log('error', error))
-    });
-  }
+    navigation.navigate("Drawer", { credential });
+  };
 
   return (
     <View style={Styles.view}>
@@ -91,7 +83,7 @@ const Login = ({ navigation }) => {
           style={Styles.btn}
           icon="login"
           mode="contained"
-          onPress={() => Access}
+          onPress={() => Access()}
         >
           Ingresar
         </Button>
