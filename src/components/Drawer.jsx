@@ -35,7 +35,6 @@ const CustomDrawerContent = (props) => {
 };
 
 const DrawerComponent = ({ route, navigation }) => {
-  const { credential } = route.params;
   return (
     <Drawer.Navigator
       initialRouteName="Home"
@@ -44,13 +43,11 @@ const DrawerComponent = ({ route, navigation }) => {
       <Drawer.Screen
         name="Home"
         component={Home}
-        initialParams={{ credential }}
         options={{title:'Inicio'}}
       />
       <Drawer.Screen
         name="Statud"
         component={Statud}
-        initialParams={{ credential }}
         options={{title:'Estados'}}
       />
       <Drawer.Screen 

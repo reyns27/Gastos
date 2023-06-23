@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useContext} from "react";
 import {
   Avatar,
   Button,
@@ -8,9 +8,9 @@ import {
   Title,
 } from "react-native-paper";
 import { View, StyleSheet, ImageBackground } from "react-native";
-
-const Home = ({ route, navigation }) => {
-  const { credential } = route.params;
+import { UserContext } from "../context/userContext";
+const Home = ({ navigation }) => {
+  const [userData,setUserData] = useContext(UserContext);
   return (
     <View>
       <ImageBackground
@@ -20,8 +20,8 @@ const Home = ({ route, navigation }) => {
       >
         <Card style={Styles.Card}>
           <Card.Content>
-            <Text>{credential.email}</Text>
-            <Text>{credential.password}</Text>
+            <Text>{userData.email}</Text>
+            <Text>{userData.username}</Text>
           </Card.Content>
         </Card>
       </ImageBackground>

@@ -1,7 +1,10 @@
-import { useState } from "react";
-import { StyleSheet, View, ImageBackground } from "react-native";
+import { useState, useContext } from "react";
+import { StyleSheet, View, ImageBackground, Alert } from "react-native";
 import { Avatar, Button, Text, TextInput } from "react-native-paper";
+import axios from "axios";
+import { UserContext } from "../context/userContext";
 
+const BaseUrl = "http://172.25.1.80:3000/login";
 
 const Styles = StyleSheet.create({
   view: {
@@ -38,13 +41,43 @@ const Styles = StyleSheet.create({
 });
 
 const Login = ({ navigation }) => {
+  const [userData, setUserData] = useContext(UserContext);
   const [credential, setCredential] = useState({
     email: "",
     password: "",
   });
 
-  const Access = () => {
-    navigation.navigate("Drawer", { credential });
+  const Access = (parameters) => {
+    const {email, password} = parameters;
+    if(email == "") return Alert.alert("Advertencia","Digite un correo",[{text:"Ok", style:"destructive", onPress:() => console.log("press")}])
+    if(password == "") return Alert.alert("Advertencia","Digite una contraseña",[{text:"Ok", style:"destructive", onPress:() => console.log("press")}])
+    axios.post(BaseUrl, parameters).then(({ status, data }) => {
+      if(status != 201) return Alert.alert("Error de conexión","Revise su conexión WIFI",[{text:"Ok", style:"destructive", onPress:() => console.log("press")}])
+      if (data.user) {
+        setUserData({
+          id:data.user.id,
+          username: data.user.userName,
+          name: data.user.Name,
+          lastname: data.user.lastName,
+          email: data.user.email,
+          rol: data.user.rolId,
+          Token: data.Token,
+        });
+        setCredential({
+          email: "",
+          password: "",
+        })
+        navigation.navigate("Drawer");
+      } 
+      if(data.response == "PASSWORD_INCORRECT")
+        Alert.alert("Advertencia", "Usuario y/o contraseña incorrecta!", [
+          {
+            text: "Ok",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel",
+          }
+        ]);
+    });
   };
 
   return (
@@ -82,7 +115,7 @@ const Login = ({ navigation }) => {
           style={Styles.btn}
           icon="login"
           mode="contained"
-          onPress={() => Access()}
+          onPress={() => Access(credential)}
         >
           Ingresar
         </Button>
