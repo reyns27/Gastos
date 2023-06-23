@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
-import { StyleSheet, View, ImageBackground, Platform } from "react-native";
+import { useState } from "react";
+import { StyleSheet, View, ImageBackground } from "react-native";
 import { Avatar, Button, Text, TextInput } from "react-native-paper";
-import * as SQLite from "expo-sqlite";
 
 
 const Styles = StyleSheet.create({
