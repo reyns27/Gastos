@@ -4,7 +4,7 @@ import { View, StyleSheet, ImageBackground } from "react-native";
 import { UserContext } from "../context/userContext";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import axios from "axios";
-const BaseUrl = "http://172.25.1.80:3000/user/";
+import { baseUrl } from "../constant";
 
 const Styles = StyleSheet.create({
   Card: {
@@ -21,16 +21,16 @@ const Styles = StyleSheet.create({
 const Profile = ({ navigation }) => {
   const [userData, setUserData] = useContext(UserContext);
   const [data, setData] = useState({
-    name:userData.name,
-    lastname:userData.lastname,
+    userName:userData.username,
+    Name:userData.name,
+    lastName:userData.lastname,
+    email:userData.email,
+    password:''
   });
-  const config ={
-    headers:{
-      Autorization:`Bearer ${userData.Token}`
-    }
-  };
+ 
   const UpdateProfile =() => {
-    axios.patch(BaseUrl + `${userData.id}`,data,config).then(({data}) => {
+    axios.defaults.headers.common['Authorization'] = `Bearer ${userData.Token}` 
+    axios.patch(`${baseUrl}user/${userData.id}`,data).then(({data}) => {
       if(data)
         setUserData({...userData, name:data.name,lastname:data.lastname})
     })
@@ -51,32 +51,35 @@ const Profile = ({ navigation }) => {
             />
             <Card.Content>
               <TextInput
-                value={data.name}
-                onChangeText={(e) => setData({...data, name:e})}
+                value={data.Name}
+                onChangeText={(e) => setData({...data, Name:e})}
                 label={"Nombre"}
                 mode={"outlined"}
                 style={Styles.input}
               />
               <TextInput
-                value={data.lastname}
-                onChangeText={(e) => setData({...data, lastname:e})}
+                value={data.lastName}
+                onChangeText={(e) => setData({...data, lastName:e})}
                 label={"Apellido"}
                 mode={"outlined"}
                 style={Styles.input}
               />
               <TextInput
-                value={userData.username}
+                value={data.userName}
+                onChangeText={(e) => setData({...data, userName:e})}
                 label={"Usuario"}
                 mode={"outlined"}
                 style={Styles.input}
               />
               <TextInput
-                value={userData.email}
+                value={data.email}
+                onChangeText={(e) => setData({...data, email:e})}
                 label={"Email"}
                 mode={"outlined"}
                 style={Styles.input}
               />
               <TextInput
+              onChangeText={(e) => setData({...data, password:e})}
                 label={"Contraseña"}
                 mode={"outlined"}
                 style={Styles.input}

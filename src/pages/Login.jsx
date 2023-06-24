@@ -1,10 +1,9 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { StyleSheet, View, ImageBackground, Alert } from "react-native";
 import { Avatar, Button, Text, TextInput } from "react-native-paper";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { UserContext } from "../context/userContext";
-
-const BaseUrl = "http://172.25.1.80:3000/login";
+import { baseUrl } from "../constant";
 
 const Styles = StyleSheet.create({
   view: {
@@ -48,36 +47,61 @@ const Login = ({ navigation }) => {
   });
 
   const Access = (parameters) => {
-    const {email, password} = parameters;
-    if(email == "") return Alert.alert("Advertencia","Digite un correo",[{text:"Ok", style:"destructive", onPress:() => console.log("press")}])
-    if(password == "") return Alert.alert("Advertencia","Digite una contraseña",[{text:"Ok", style:"destructive", onPress:() => console.log("press")}])
-    axios.post(BaseUrl, parameters).then(({ status, data }) => {
-      if(status != 201) return Alert.alert("Error de conexión","Revise su conexión WIFI",[{text:"Ok", style:"destructive", onPress:() => console.log("press")}])
-      if (data.user) {
-        setUserData({
-          id:data.user.id,
-          username: data.user.userName,
-          name: data.user.Name,
-          lastname: data.user.lastName,
-          email: data.user.email,
-          rol: data.user.rolId,
-          Token: data.Token,
-        });
-        setCredential({
-          email: "",
-          password: "",
-        })
-        navigation.navigate("Drawer");
-      } 
-      if(data.response == "PASSWORD_INCORRECT")
-        Alert.alert("Advertencia", "Usuario y/o contraseña incorrecta!", [
+    const { email, password } = parameters;
+    if (email == "")
+      return Alert.alert("Advertencia", "Digite un correo", [
+        {
+          text: "Ok",
+          style: "destructive",
+          onPress: () => console.log("press"),
+        },
+      ]);
+    if (password == "")
+      return Alert.alert("Advertencia", "Digite una contraseña", [
+        {
+          text: "Ok",
+          style: "destructive",
+          onPress: () => console.log("press"),
+        },
+      ]);
+    axios
+      .post(`${baseUrl}login`, parameters)
+      .then(({ status, data }) => {
+        if (data.user) {
+          setUserData({
+            id: data.user.Id,
+            username: data.user.userName,
+            name: data.user.Name,
+            lastname: data.user.lastName,
+            email: data.user.email,
+            rol: data.user.rolId,
+            Token: data.Token,
+          });
+          setCredential({
+            email: "",
+            password: "",
+          });
+          navigation.navigate("Drawer");
+        }
+        if (data.response == "PASSWORD_INCORRECT")
+          Alert.alert("Advertencia", "Usuario y/o contraseña incorrecta!", [
+            {
+              text: "Ok",
+              onPress: () => console.log("Cancel Pressed"),
+              style: "cancel",
+            },
+          ]);
+      })
+      .catch(Axios => {
+        console.log(Axios);
+        return Alert.alert("Error de conexión", "Revise su conexión a internet", [
           {
             text: "Ok",
-            onPress: () => console.log("Cancel Pressed"),
-            style: "cancel",
-          }
+            style: "destructive",
+            onPress: () => console.log("press"),
+          },
         ]);
-    });
+      });
   };
 
   return (
