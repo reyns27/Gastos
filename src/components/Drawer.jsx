@@ -9,6 +9,7 @@ import Home from "../pages/Home";
 import Profile from "../pages/Profile";
 import { Alert } from "react-native";
 import Statud from "../pages/Statud";
+import StatudDetails from "../pages/StatudDetails";
 const Drawer = createDrawerNavigator();
 
 const CustomDrawerContent = (props) => {
@@ -43,17 +44,23 @@ const DrawerComponent = ({ route, navigation }) => {
       <Drawer.Screen
         name="Home"
         component={Home}
-        options={{title:'Inicio'}}
+        options={{ title: "Inicio" }}
       />
       <Drawer.Screen
         name="Statud"
         component={Statud}
-        options={{title:'Estados'}}
+        options={{ title: "Estados" }}
       />
-      <Drawer.Screen 
-        name="Profile" 
-        component={Profile} 
-        options={{title:'Perfil'}}/>
+      <Drawer.Screen
+        name="Profile"
+        component={Profile}
+        options={{ title: "Perfil" }}
+      />
+      <Drawer.Screen
+        name="StatudDetails"
+        component={StatudDetails}
+        options={{ title: "Detalle", drawerType:"slide", drawerItemStyle: { display: "none"}}}
+      />
     </Drawer.Navigator>
   );
 };

@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect } from "react";
 import { UserContext } from "../context/userContext";
-import { ImageBackground, View, StyleSheet } from "react-native";
+import { ImageBackground, View, StyleSheet, Alert } from "react-native";
 import {
   Card,
   Avatar,
@@ -11,10 +11,10 @@ import {
   Button,
   TextInput,
   Divider,
+  List,
 } from "react-native-paper";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import axios from "axios";
-import TableComponent from "../components/Table";
 import { baseUrl } from "../constant";
 const Styles = StyleSheet.create({
   Card: {
@@ -24,11 +24,12 @@ const Styles = StyleSheet.create({
   CardArray: {
     margin: 10,
     backgroundColor: "transparent",
-    padding: 10
+    padding: 10,
+    display: "flex",
   },
   Title: {
     color: "white",
-    fontWeight: 'bold'
+    fontWeight: "bold",
   },
   buttonIcon: {
     backgroundColor: "#9023F2",
@@ -41,12 +42,63 @@ const Styles = StyleSheet.create({
     width: 350,
     height: 350,
   },
+  ViewTotal: {
+    alignSelf: "flex-start",
+  },
+  CardActions: {
+    display: "flex",
+  },
 });
 
-const CreateStatusModalComponent = ({ visible, setVisible }) => {
+const CreateStatusModalComponent = ({
+  visible,
+  setVisible,
+  userData,
+  setChange,
+  change,
+}) => {
   const hideModal = () => setVisible(false);
-  const containerStyle = { backgroundColor: "white", padding: 20 };
+  const [data, setData] = useState({
+    description: "",
+    userId: userData.id,
+    expenses: 0,
+    income: 0,
+    balance: 0,
+  });
 
+  const createNewStatud = () => {
+    if (data.description == "")
+      return Alert.alert(
+        "Advertencia",
+        "Escriba un nombre para el nuevo estado!",
+        [
+          {
+            text: "Ok",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel",
+          },
+        ]
+      );
+    axios.defaults.headers.common["Authorization"] = `Bearer ${userData.Token}`;
+    axios.post(`${baseUrl}statud`, data).then(({ data }) => {
+      if (data.description != undefined) {
+        return Alert.alert("Advertencia", `Nuevo estado ${data.description}`, [
+          {
+            text: "Ok",
+            onPress: () => setChange(!change),
+            style: "cancel",
+          },
+        ]);
+      }
+      return Alert.alert("Advertencia", `No se pudo crear el estado!`, [
+        {
+          text: "Ok",
+          onPress: () => null,
+          style: "cancel",
+        },
+      ]);
+    });
+  };
   return (
     <KeyboardAwareScrollView>
       <View>
@@ -59,7 +111,10 @@ const CreateStatusModalComponent = ({ visible, setVisible }) => {
             <Card>
               <Card.Title title={"Nuevo estado"} />
               <Card.Content>
-                <TextInput label={"Nombre de estado"} />
+                <TextInput
+                  label={"Nombre de estado"}
+                  onChangeText={(e) => setData({ ...data, description: e })}
+                />
               </Card.Content>
               <Card.Actions>
                 <IconButton
@@ -67,7 +122,11 @@ const CreateStatusModalComponent = ({ visible, setVisible }) => {
                   icon={"close-circle"}
                   onPress={() => hideModal()}
                 />
-                <IconButton mode="contained" icon={"content-save"} />
+                <IconButton
+                  mode="contained"
+                  icon={"content-save"}
+                  onPress={() => createNewStatud()}
+                />
               </Card.Actions>
             </Card>
           </Modal>
@@ -78,25 +137,25 @@ const CreateStatusModalComponent = ({ visible, setVisible }) => {
 };
 
 const Statud = ({ route, navigation }) => {
-
   //ESTADOS
   const [userData, setUserData] = useContext(UserContext);
+  const [change, setChange] = useState(false);
   const [visible, setVisible] = useState(false);
   const showModal = () => setVisible(true);
-  const [data, setData] = useState([])
+  const [data, setData] = useState([]);
   //FUNCIONES
   const GetData = async () => {
-    axios.defaults.headers.common['Authorization'] = `Bearer ${userData.Token}`
-    await axios.get(`${baseUrl}statud/getuserid/${userData.id}`).then(({ data }) => {
-      setData(data)
-    })
-  }
+    axios.defaults.headers.common["Authorization"] = `Bearer ${userData.Token}`;
+    await axios
+      .get(`${baseUrl}statud/getuserid/${userData.id}`)
+      .then(({ data }) => {
+        setData(data);
+      });
+  };
 
   useEffect(() => {
     GetData();
-  }, []);
-
-
+  }, [change]);
 
   return (
     <View>
@@ -109,10 +168,12 @@ const Statud = ({ route, navigation }) => {
           <Card.Content>
             <Card.Title
               titleStyle={Styles.Title}
-              subtitleStyle={{ color: 'white' }}
+              subtitleStyle={{ color: "white" }}
               title={"Mis Estados"}
               subtitle="Card Subtitle"
-              left={(props) => <Avatar.Icon {...props} icon="calendar-blank-multiple" />}
+              left={(props) => (
+                <Avatar.Icon {...props} icon="calendar-blank-multiple" />
+              )}
               right={(props) => (
                 <IconButton
                   style={Styles.buttonIcon}
@@ -126,45 +187,61 @@ const Statud = ({ route, navigation }) => {
             ></Card.Title>
           </Card.Content>
         </Card>
-        {
-          data.length != null ?
-            (data.map((ele, i) => (
-              <Card key={i} style={Styles.CardArray}>
-                <Card.Title
-                  titleStyle={{ color: 'white', fontWeight: 'bold' }}
-                  title={ele.description}
-                  subtitleStyle={{ color: 'white' }}
-                  subtitleVariant="labelMedium"
-                  subtitle={`Balance: ${ele.balance}`}
-                  left={(props) => <Avatar.Icon {...props} icon="calendar-check" />}
-                  right={(props) => (
-                    <IconButton
-                      style={Styles.buttonIcon}
-                      mode="contained"
-                      {...props}
-                      icon="calendar-edit"
-                      iconColor="white"
-                      onPress={() => showModal()}
-                    />
-                  )} />
-                   <Divider theme={{ colors: { primary: 'green' } }}/>
-                <Card.Actions>
+        {data.length != null ? (
+          data.map((ele, i) => (
+            <Card key={i} style={Styles.CardArray}>
+              <Card.Title
+                titleStyle={{ color: "white", fontWeight: "bold" }}
+                title={ele.description}
+                subtitleStyle={{ color: "white" }}
+                subtitleVariant="labelMedium"
+                subtitle={`Inicio: ${ele.createdAt}`}
+                left={(props) => (
+                  <Avatar.Icon {...props} icon="calendar-check" />
+                )}
+                right={(props) => (
                   <IconButton
                     style={Styles.buttonIcon}
                     mode="contained"
+                    {...props}
                     icon="calendar-edit"
                     iconColor="white"
-                    onPress={() => showModal()}
+                    onPress={() =>
+                      navigation.navigate("StatudDetails", { statud: ele })
+                    }
                   />
-                </Card.Actions>
-              </Card>
-            )))
-            :
-            <Card>
-              <Card.Content><Text>Cargando......</Text></Card.Content>
+                )}
+              />
+              <Divider theme={{ colors: { primary: "green" } }} />
+              <Card.Actions style={Styles.CardActions}>
+                <View style={Styles.ViewTotal}>
+                  <Text style={{ color: "green", fontWeight: "bold" }}>
+                    Ingresos: {ele.expenses}
+                  </Text>
+                  <Text style={{ color: "red", fontWeight: "bold" }}>
+                    Gastos: {ele.income}
+                  </Text>
+                  <Text style={{ color: "blue", fontWeight: "bold" }}>
+                    Balance: {ele.balance}
+                  </Text>
+                </View>
+              </Card.Actions>
             </Card>
-        }
-        <CreateStatusModalComponent visible={visible} setVisible={setVisible} />
+          ))
+        ) : (
+          <Card>
+            <Card.Content>
+              <Text>Cargando......</Text>
+            </Card.Content>
+          </Card>
+        )}
+        <CreateStatusModalComponent
+          visible={visible}
+          setVisible={setVisible}
+          userData={userData}
+          setChange={setChange}
+          change={change}
+        />
       </ImageBackground>
     </View>
   );
