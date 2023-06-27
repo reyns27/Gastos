@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Card, IconButton, Text, TextInput } from "react-native-paper";
 import { View, StyleSheet, ImageBackground } from "react-native";
 import { UserContext } from "../context/userContext";
@@ -21,18 +21,19 @@ const Styles = StyleSheet.create({
 const Profile = ({ navigation }) => {
   const [userData, setUserData] = useContext(UserContext);
   const [data, setData] = useState({
-    userName:userData.username,
     Name:userData.name,
     lastName:userData.lastname,
-    email:userData.email,
-    password:''
+    userName:userData.username,
+    email:userData.email
   });
+
+
  
   const UpdateProfile =() => {
     axios.defaults.headers.common['Authorization'] = `Bearer ${userData.Token}` 
     axios.patch(`${baseUrl}user/${userData.id}`,data).then(({data}) => {
       if(data)
-        setUserData({...userData, name:data.name,lastname:data.lastname})
+        setUserData({...userData, name:data.Name,lastname:data.lastName,email:data.email,username:data.userName})
     })
   };
 
